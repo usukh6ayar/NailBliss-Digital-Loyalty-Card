@@ -1,5 +1,5 @@
-
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +13,7 @@ export const AuthForm = () => {
   const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const [signInData, setSignInData] = useState({
     email: '',
@@ -47,6 +48,8 @@ export const AuthForm = () => {
           title: "Welcome back!",
           description: "You've successfully signed in.",
         });
+        // Navigation will be handled by the auth state change in App.tsx
+        navigate('/');
       }
     } catch (error) {
       toast({
@@ -83,6 +86,10 @@ export const AuthForm = () => {
           title: "Welcome to NailBliss!",
           description: "Please check your email to verify your account.",
         });
+        // For email confirmation flow, redirect after a short delay
+        setTimeout(() => {
+          navigate('/');
+        }, 2000);
       }
     } catch (error) {
       toast({
