@@ -1,12 +1,11 @@
-
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Sparkles, Gift, Crown } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
-import { generateQRCode, encryptQRData } from '@/lib/qr';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Sparkles, Gift, Crown } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { generateQRCode, encryptQRData } from "@/lib/qr";
 
 interface LoyaltyCardData {
   points: number;
@@ -17,14 +16,14 @@ interface LoyaltyCardData {
 export const LoyaltyCard = () => {
   const { user, profile } = useAuth();
   const [loyaltyData, setLoyaltyData] = useState<LoyaltyCardData | null>(null);
-  const [qrCode, setQrCode] = useState<string>('');
+  const [qrCode, setQrCode] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user && profile?.role === 'customer') {
+    if (user && profile?.role === "customer") {
       fetchLoyaltyData();
       generateNewQRCode();
-      
+
       // Refresh QR code every 60 seconds
       const interval = setInterval(generateNewQRCode, 60000);
       return () => clearInterval(interval);
@@ -33,22 +32,22 @@ export const LoyaltyCard = () => {
 
   const fetchLoyaltyData = async () => {
     if (!user) return;
-    
+
     try {
       const { data, error } = await supabase
-        .from('loyalty_cards')
-        .select('points, total_visits, last_visit')
-        .eq('customer_id', user.id)
+        .from("loyalty_cards")
+        .select("points, total_visits, last_visit")
+        .eq("customer_id", user.id)
         .single();
 
       if (error) {
-        console.error('Error fetching loyalty data:', error);
+        console.error("Error fetching loyalty data:", error);
         return;
       }
 
       setLoyaltyData(data);
     } catch (error) {
-      console.error('Error fetching loyalty data:', error);
+      console.error("Error fetching loyalty data:", error);
     } finally {
       setLoading(false);
     }
@@ -56,7 +55,7 @@ export const LoyaltyCard = () => {
 
   const generateNewQRCode = async () => {
     if (!user) return;
-    
+
     const timestamp = Date.now();
     const encryptedData = encryptQRData(user.id, timestamp);
     const qrCodeUrl = await generateQRCode(encryptedData);
@@ -66,11 +65,11 @@ export const LoyaltyCard = () => {
   const renderProgressBubbles = () => {
     const bubbles = [];
     const currentPoints = loyaltyData?.points || 0;
-    
+
     for (let i = 0; i < 5; i++) {
       const isFilled = i < currentPoints;
       const isReward = i === 4;
-      
+
       bubbles.push(
         <motion.div
           key={i}
@@ -78,24 +77,28 @@ export const LoyaltyCard = () => {
           animate={{ scale: 1 }}
           transition={{ delay: i * 0.1 }}
           className={`relative w-12 h-12 rounded-full flex items-center justify-center shadow-lg ${
-            isReward 
-              ? isFilled 
-                ? 'bg-gradient-to-br from-yellow-400 to-amber-500 shadow-amber-200' 
-                : 'bg-gray-100 border-2 border-dashed border-amber-300'
-              : isFilled 
-                ? 'bg-gradient-to-br from-rose-400 to-pink-500 shadow-rose-200' 
-                : 'bg-gray-100 border-2 border-dashed border-gray-300'
+            isReward
+              ? isFilled
+                ? "bg-gradient-to-br from-yellow-400 to-amber-500 shadow-amber-200"
+                : "bg-gray-100 border-2 border-dashed border-amber-300"
+              : isFilled
+              ? "bg-gradient-to-br from-rose-400 to-pink-500 shadow-rose-200"
+              : "bg-gray-100 border-2 border-dashed border-gray-300"
           }`}
         >
           {isReward ? (
-            isFilled ? <Crown className="h-6 w-6 text-white" /> : <Gift className="h-6 w-6 text-amber-400" />
+            isFilled ? (
+              <Crown className="h-6 w-6 text-white" />
+            ) : (
+              <Gift className="h-6 w-6 text-amber-400" />
+            )
           ) : (
             isFilled && <Sparkles className="h-5 w-5 text-white" />
           )}
         </motion.div>
       );
     }
-    
+
     return bubbles;
   };
 
@@ -123,9 +126,10 @@ export const LoyaltyCard = () => {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-3">
                 <Avatar className="h-12 w-12 border-2 border-white/50">
-                  <AvatarImage src={profile?.avatar_url || ''} />
+                  <AvatarImage src={profile?.avatar_url || ""} />
                   <AvatarFallback className="bg-white/20 text-white font-semibold">
-                    {profile?.first_name?.[0]}{profile?.last_name?.[0]}
+                    {profile?.first_name?.[0]}
+                    {profile?.last_name?.[0]}
                   </AvatarFallback>
                 </Avatar>
                 <div>
@@ -137,13 +141,17 @@ export const LoyaltyCard = () => {
               </div>
               <div className="text-right">
                 <p className="text-white/80 text-sm">Total Visits</p>
-                <p className="text-white font-bold text-xl">{loyaltyData?.total_visits || 0}</p>
+                <p className="text-white font-bold text-xl">
+                  {loyaltyData?.total_visits || 0}
+                </p>
               </div>
             </div>
 
             <div className="text-center mb-6">
               <h4 className="text-white text-lg font-light mb-2">
-                {isRewardReady ? '🎉 Reward Ready!' : 'Collect 5 stamps for a reward'}
+                {isRewardReady
+                  ? "🎉 Reward Ready!"
+                  : "Collect 5 stamps for a reward"}
               </h4>
               <div className="flex justify-center space-x-2">
                 {renderProgressBubbles()}
@@ -180,11 +188,7 @@ export const LoyaltyCard = () => {
             <div className="flex justify-center mb-4">
               <div className="p-4 bg-white rounded-lg shadow-inner border-2 border-gray-100">
                 {qrCode && (
-                  <img 
-                    src={qrCode} 
-                    alt="QR Code" 
-                    className="w-48 h-48"
-                  />
+                  <img src={qrCode} alt="QR Code" className="w-48 h-48" />
                 )}
               </div>
             </div>
