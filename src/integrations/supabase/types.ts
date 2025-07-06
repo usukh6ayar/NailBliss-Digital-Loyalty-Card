@@ -50,6 +50,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          card_template: string | null
           created_at: string | null
           email: string
           first_name: string | null
@@ -57,9 +58,11 @@ export type Database = {
           last_name: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string | null
+          username: string | null
         }
         Insert: {
           avatar_url?: string | null
+          card_template?: string | null
           created_at?: string | null
           email: string
           first_name?: string | null
@@ -67,9 +70,11 @@ export type Database = {
           last_name?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
+          username?: string | null
         }
         Update: {
           avatar_url?: string | null
+          card_template?: string | null
           created_at?: string | null
           email?: string
           first_name?: string | null
@@ -77,6 +82,7 @@ export type Database = {
           last_name?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
+          username?: string | null
         }
         Relationships: []
       }
