@@ -1,7 +1,11 @@
-
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Check } from "lucide-react";
@@ -17,23 +21,30 @@ interface CardTemplateModalProps {
 const templates = {
   pink: {
     name: "Rose Blush",
-    gradient: "bg-gradient-to-br from-rose-400 via-pink-500 to-purple-600",
+    gradient: "bg-gradient-to-br from-rose-400 via-pink-500 to-fuchsia-600",
   },
   gold: {
     name: "Golden Hour",
-    gradient: "bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-600",
+    gradient: "bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500",
   },
-  floral: {
+  ocean: {
     name: "Ocean Breeze",
-    gradient: "bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600",
+    gradient: "bg-gradient-to-br from-cyan-400 via-sky-500 to-indigo-600",
   },
-  minimalist: {
-    name: "Midnight",
-    gradient: "bg-gradient-to-br from-gray-600 via-slate-700 to-gray-800",
+  lavender: {
+    name: "Lavender Dream",
+    gradient: "bg-gradient-to-br from-violet-400 via-purple-500 to-indigo-500",
+  },
+  nude: {
+    name: "Minimal Nude",
+    gradient: "bg-gradient-to-br from-neutral-200 via-zinc-300 to-neutral-400",
   },
 };
 
-export const CardTemplateModal = ({ open, onOpenChange }: CardTemplateModalProps) => {
+export const CardTemplateModal = ({
+  open,
+  onOpenChange,
+}: CardTemplateModalProps) => {
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -82,7 +93,7 @@ export const CardTemplateModal = ({ open, onOpenChange }: CardTemplateModalProps
         <DialogHeader>
           <DialogTitle className="text-center">Choose Card Design</DialogTitle>
         </DialogHeader>
-        
+
         <div className="p-4">
           <div className="grid grid-cols-2 gap-4">
             {Object.entries(templates).map(([key, template]) => (
@@ -93,8 +104,8 @@ export const CardTemplateModal = ({ open, onOpenChange }: CardTemplateModalProps
               >
                 <Card
                   className={`relative h-24 cursor-pointer border-2 transition-all duration-200 ${
-                    selectedTemplate === key 
-                      ? "border-rose-500 shadow-lg scale-105" 
+                    selectedTemplate === key
+                      ? "border-rose-500 shadow-lg scale-105"
                       : "border-gray-200 hover:border-rose-300 hover:shadow-md"
                   } ${template.gradient}`}
                   onClick={() => handleTemplateSelect(key)}
@@ -119,7 +130,7 @@ export const CardTemplateModal = ({ open, onOpenChange }: CardTemplateModalProps
               </motion.div>
             ))}
           </div>
-          
+
           <div className="mt-6 text-center">
             <Button
               variant="outline"

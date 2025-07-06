@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Gift, Crown } from "lucide-react";
@@ -135,79 +134,23 @@ export const ProfileCardBack = () => {
   const isRewardReady = currentPoints >= 5;
 
   return (
-    <div className="w-full h-full p-6 flex flex-col text-white">
-      {/* Header */}
-      <div className="text-center mb-4">
-        <motion.h3
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-white text-lg font-medium mb-4 leading-relaxed"
-        >
+    <div className="relative w-[340px] h-[215px] p-4 rounded-xl shadow-2xl bg-gradient-to-br from-rose-500 to-pink-600 text-white flex flex-col justify-between overflow-hidden">
+      <div>
+        <h3 className="text-base font-semibold text-center mb-3">
           {isRewardReady ? "🎉 Reward Ready!" : "Collect 5 stamps for a reward"}
-        </motion.h3>
-        
-        {/* Progress Bubbles */}
-        <div className="flex justify-center space-x-2 mb-4">
+        </h3>
+        <div className="flex justify-center gap-2">
           {renderProgressBubbles()}
         </div>
-        
-        {isRewardReady && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-white/90 text-sm leading-relaxed"
-          >
-            Show your QR code to claim 50% off!
-          </motion.p>
-        )}
       </div>
 
-      {/* Visit Stats */}
-      <div className="flex justify-between text-white/80 text-sm mb-4">
-        <span>Visits: {loyaltyData?.total_visits || 0}</span>
-        {loyaltyData?.last_visit && (
-          <span>Last: {new Date(loyaltyData.last_visit).toLocaleDateString()}</span>
-        )}
-      </div>
-
-      {/* QR Code Section */}
-      <div className="flex-1 flex flex-col items-center justify-center">
-        {qrLoading ? (
-          <div className="flex flex-col items-center space-y-2">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-            <p className="text-white/70 text-sm">Generating QR...</p>
-          </div>
-        ) : qrCode ? (
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="space-y-3 text-center"
-          >
-            <div className="bg-white/95 rounded-lg p-3 shadow-lg">
-              <img 
-                src={qrCode} 
-                alt="QR Code" 
-                className="w-32 h-32 mx-auto" 
-              />
-            </div>
-            <div className="space-y-1">
-              <p className="text-white/90 text-sm font-medium">
-                Show to staff to earn points
-              </p>
-              <p className="text-white/70 text-xs">
-                New QR in {countdown}s
-              </p>
-              <div className="w-32 bg-white/20 rounded-full h-1 mx-auto">
-                <div 
-                  className="bg-white h-1 rounded-full transition-all duration-1000"
-                  style={{ width: `${(countdown / 60) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-          </motion.div>
-        ) : (
-          <p className="text-white/70 text-sm">QR code unavailable</p>
-        )}
+      <div className="flex items-end justify-between text-xs text-white/80">
+        <div>
+          <p>Visits: {loyaltyData?.total_visits || 0}</p>
+          {loyaltyData?.last_visit && (
+            <p>Last: {new Date(loyaltyData.last_visit).toLocaleDateString()}</p>
+          )}
+        </div>
       </div>
     </div>
   );

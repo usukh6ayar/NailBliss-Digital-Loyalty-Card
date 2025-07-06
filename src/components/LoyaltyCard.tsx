@@ -1,7 +1,7 @@
-
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { FlipCard } from "./loyalty/FlipCard";
+import { QRCodeSection } from "./loyalty/QRCodeSection"; // <-- import QR code section
 
 export const LoyaltyCard = () => {
   const { user, profile } = useAuth();
@@ -18,19 +18,21 @@ export const LoyaltyCard = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-sm mx-auto space-y-4"
+      className="max-w-sm mx-auto space-y-6"
     >
+      {/* Loyalty Card */}
       <FlipCard />
-      
+
+      {/* QR Code Section */}
+      <QRCodeSection />
+
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
         className="text-center"
       >
-        <p className="text-gray-600 text-sm">
-          NailBliss Digital Loyalty Card
-        </p>
+        <p className="text-gray-600 text-sm">NailBliss Digital Loyalty Card</p>
       </motion.div>
     </motion.div>
   );

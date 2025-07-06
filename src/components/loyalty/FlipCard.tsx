@@ -1,12 +1,9 @@
-
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Edit3 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { ProfileCardFront } from "./ProfileCardFront";
 import { ProfileCardBack } from "./ProfileCardBack";
 import { InCardEditModal } from "./InCardEditModal";
-
 export const FlipCard = () => {
   const { user, profile } = useAuth();
   const [isFlipped, setIsFlipped] = useState(false);
@@ -34,41 +31,52 @@ export const FlipCard = () => {
   };
 
   return (
-    <div className="perspective-1000 w-full max-w-sm mx-auto">
-      <motion.div
-        ref={cardRef}
-        className="relative w-full h-96 preserve-3d cursor-pointer"
-        animate={{ rotateY: isFlipped ? 180 : 0 }}
-        transition={{ duration: 0.6, ease: "easeInOut" }}
-        onClick={() => setIsFlipped(!isFlipped)}
-      >
-        {/* Front Side */}
-        <div className="absolute inset-0 backface-hidden">
-          <div className={`w-full h-full bg-gradient-to-br ${getCardStyles(selectedTemplate)} rounded-2xl shadow-xl overflow-hidden`}>
-            <ProfileCardFront 
-              profile={profile}
-              onEditClick={(e) => {
-                e.stopPropagation();
-                setShowEditModal(true);
-              }}
-            />
+    <>
+      {/* CARD Container */}
+      <div className="w-[340px] h-[215px] mx-auto perspective-1000">
+        <motion.div
+          ref={cardRef}
+          className="relative w-full h-full preserve-3d"
+          animate={{ rotateY: isFlipped ? 180 : 0 }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
+          onClick={() => setIsFlipped(!isFlipped)}
+        >
+          {/* Front */}
+          <div className="absolute w-full h-full backface-hidden">
+            <div
+              className={`w-full h-full bg-gradient-to-br ${getCardStyles(
+                selectedTemplate
+              )} rounded-xl shadow-2xl overflow-hidden`}
+            >
+              <ProfileCardFront
+                profile={profile}
+                onEditClick={(e) => {
+                  e.stopPropagation();
+                  setShowEditModal(true);
+                }}
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Back Side */}
-        <div className="absolute inset-0 backface-hidden rotate-y-180">
-          <div className={`w-full h-full bg-gradient-to-br ${getCardStyles(selectedTemplate)} rounded-2xl shadow-xl overflow-hidden`}>
-            <ProfileCardBack />
+          {/* Back */}
+          <div className="absolute w-full h-full backface-hidden rotate-y-180">
+            <div
+              className={`w-full h-full bg-gradient-to-br ${getCardStyles(
+                selectedTemplate
+              )} rounded-xl shadow-2xl overflow-hidden`}
+            >
+              <ProfileCardBack />
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
 
-      {/* In-Card Edit Modal */}
-      <InCardEditModal 
+      {/* OUTSIDE MODAL */}
+      <InCardEditModal
         open={showEditModal}
         onOpenChange={setShowEditModal}
         cardRef={cardRef}
       />
-    </div>
+    </>
   );
 };
