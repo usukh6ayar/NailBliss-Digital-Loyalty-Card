@@ -9,6 +9,8 @@ export interface Profile {
   last_name: string | null;
   role: 'customer' | 'staff';
   avatar_url: string | null;
+  username: string | null;
+  card_template: string | null;
 }
 
 export const signUp = async (email: string, password: string, firstName: string, lastName: string, role: 'customer' | 'staff' = 'customer') => {
