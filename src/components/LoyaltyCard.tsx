@@ -2,11 +2,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
-import { FlipCard } from "./loyalty/FlipCard";
+import { ProfileCard } from "./loyalty/ProfileCard";
+import { QRCodeSection } from "./loyalty/QRCodeSection";
 
 export const LoyaltyCard = () => {
   const { user, profile } = useAuth();
-  const [isFlipped, setIsFlipped] = useState(false);
 
   if (!user || !profile || profile.role !== "customer") {
     return (
@@ -20,18 +20,16 @@ export const LoyaltyCard = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-sm mx-auto"
+      className="max-w-sm mx-auto space-y-4"
     >
-      <FlipCard 
-        isFlipped={isFlipped} 
-        onFlip={() => setIsFlipped(!isFlipped)} 
-      />
+      <ProfileCard />
+      <QRCodeSection />
       
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="text-center mt-4"
+        className="text-center"
       >
         <p className="text-gray-600 text-sm">
           NailBliss Digital Loyalty Card
