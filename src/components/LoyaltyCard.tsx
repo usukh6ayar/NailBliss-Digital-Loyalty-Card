@@ -1,9 +1,7 @@
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
-import { ProfileCard } from "./loyalty/ProfileCard";
-import { QRCodeSection } from "./loyalty/QRCodeSection";
+import { FlipCard } from "./loyalty/FlipCard";
 
 export const LoyaltyCard = () => {
   const { user, profile } = useAuth();
@@ -22,8 +20,7 @@ export const LoyaltyCard = () => {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-sm mx-auto space-y-4"
     >
-      <ProfileCard />
-      <QRCodeSection />
+      <FlipCard />
       
       <motion.div
         initial={{ opacity: 0 }}
