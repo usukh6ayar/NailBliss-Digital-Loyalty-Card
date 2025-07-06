@@ -1,11 +1,10 @@
-
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Sparkles, LogOut } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
-import { signOut } from '@/lib/auth';
-import { useToast } from '@/hooks/use-toast';
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Sparkles, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { signOut } from "@/lib/auth";
+import { useToast } from "@/hooks/use-toast";
 
 export const Header = () => {
   const { profile } = useAuth();
@@ -13,12 +12,12 @@ export const Header = () => {
 
   const handleSignOut = async () => {
     const { error } = await signOut();
-    
+
     if (error) {
       toast({
         title: "Error",
         description: "Failed to sign out. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -31,10 +30,11 @@ export const Header = () => {
     >
       <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Sparkles className="h-6 w-6 text-rose-500" />
-          <h1 className="text-xl font-light text-gray-800">NailBliss</h1>
+          <h1 className="text-2xl font-serif tracking-wider text-gray-800">
+            NailBliss
+          </h1>
         </div>
-        
+
         <div className="flex items-center space-x-3">
           <div className="text-right">
             <p className="text-sm font-medium text-gray-800">
@@ -42,14 +42,7 @@ export const Header = () => {
             </p>
             <p className="text-xs text-gray-600 capitalize">{profile?.role}</p>
           </div>
-          
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={profile?.avatar_url || ''} />
-            <AvatarFallback className="bg-rose-100 text-rose-700 text-sm">
-              {profile?.first_name?.[0]}{profile?.last_name?.[0]}
-            </AvatarFallback>
-          </Avatar>
-          
+
           <Button
             variant="ghost"
             size="sm"
