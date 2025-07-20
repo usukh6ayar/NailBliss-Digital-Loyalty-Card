@@ -17,28 +17,34 @@ export const QRScanner = () => {
     try {
       setError(null);
 
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      // ✅ 1. Check browser support
+      if (
+        typeof window === "undefined" ||
+        !navigator.mediaDevices ||
+        typeof navigator.mediaDevices.getUserMedia !== "function"
+      ) {
         throw new Error("Camera access not supported on this device/browser.");
       }
 
-      // Check if scanner element exists
+      // ✅ 2. Get list of cameras
+      const cameras = await Html5Qrcode.getCameras();
+      if (!cameras || cameras.length === 0) {
+        throw new Error("No cameras found on this device.");
+      }
+
+      // ✅ 3. Prefer back camera if available
+      const rearCamera = cameras.find((cam) =>
+        cam.label.toLowerCase().includes("back")
+      );
+
+      const selectedCameraId = rearCamera?.id || cameras[0].id;
+
       if (!scannerRef.current) {
         throw new Error("Scanner element not found");
       }
 
-      // Request camera permission first
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
-      });
+      html5QrCodeRef.current = new Html5Qrcode("qr-scanner");
 
-      // Stop the stream immediately - we just needed permission
-      stream.getTracks().forEach((track) => track.stop());
-
-      // Initialize Html5Qrcode with proper element ID
-      const scannerId = "qr-scanner";
-      html5QrCodeRef.current = new Html5Qrcode(scannerId);
-
-      // Enhanced configuration
       const config = {
         fps: 10,
         qrbox: { width: 250, height: 250 },
@@ -50,16 +56,13 @@ export const QRScanner = () => {
         },
       };
 
-      // Start scanning with better error handling
       await html5QrCodeRef.current.start(
-        { facingMode: "environment" }, // Try back camera first
+        selectedCameraId, // 🔥 instead of facingMode
         config,
-        (decodedText, decodedResult) => {
-          console.log("QR Code detected:", decodedText);
+        (decodedText) => {
           handleQRSuccess(decodedText);
         },
         (errorMessage) => {
-          // Only log significant errors, not every frame failure
           if (errorMessage && !errorMessage.includes("No QR code found")) {
             console.warn("QR scan error:", errorMessage);
           }
