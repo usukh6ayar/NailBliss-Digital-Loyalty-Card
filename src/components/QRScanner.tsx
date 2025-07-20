@@ -5,14 +5,18 @@ import { toast } from "@/hooks/use-toast";
 import { CheckCircle, Camera, X, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { decryptQRData } from "@/lib/qr";
+import { supabase } from "@/integrations/supabase/client";
+import { QRConfirmationDialog } from "./QRConfirmationDialog";
 
 export const QRScanner = () => {
   const scannerRef = useRef<HTMLDivElement>(null);
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
   const [scanning, setScanning] = useState(false);
-  const [showScannerDiv, setShowScannerDiv] = useState(false); // NEW
+  const [showScannerDiv, setShowScannerDiv] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [customerData, setCustomerData] = useState<any>(null);
 
   const startScanner = async () => {
     setError(null);
@@ -101,7 +105,7 @@ export const QRScanner = () => {
     }, 100); // Wait 100ms for the div to render
   };
 
-  const handleQRSuccess = (decodedText: string) => {
+  const handleQRSuccess = async (decodedText: string) => {
     setResult(decodedText);
     stopScanner();
 
@@ -109,14 +113,45 @@ export const QRScanner = () => {
     const decryptedData = decryptQRData(decodedText);
 
     if (decryptedData) {
-      toast({
-        title: "QR Code Scanned Successfully!",
-        description: `Customer ID: ${decryptedData.userId.substring(0, 8)}...`,
-      });
+      try {
+        // Fetch customer profile and loyalty card data
+        const [profileResult, loyaltyResult] = await Promise.all([
+          supabase
+            .from("profiles")
+            .select("first_name, last_name, username, avatar_url")
+            .eq("id", decryptedData.userId)
+            .single(),
+          supabase
+            .from("loyalty_cards")
+            .select("points, total_visits")
+            .eq("customer_id", decryptedData.userId)
+            .single()
+        ]);
 
-      // TODO: Process the loyalty point addition here
-      // Call your loyalty point function with decryptedData.userId
-      console.log("Decrypted QR data:", decryptedData);
+        if (profileResult.error && profileResult.error.code !== 'PGRST116') {
+          throw profileResult.error;
+        }
+
+        if (loyaltyResult.error && loyaltyResult.error.code !== 'PGRST116') {
+          throw loyaltyResult.error;
+        }
+
+        // Set customer data and show confirmation
+        setCustomerData({
+          userId: decryptedData.userId,
+          profile: profileResult.data,
+          loyaltyCard: loyaltyResult.data
+        });
+        setShowConfirmation(true);
+
+      } catch (error: any) {
+        console.error("Error fetching customer data:", error);
+        toast({
+          title: "Error Loading Customer Data",
+          description: "Unable to load customer information. Please try again.",
+          variant: "destructive",
+        });
+      }
     } else {
       toast({
         title: "Invalid QR Code",
@@ -147,6 +182,13 @@ export const QRScanner = () => {
     setError(null);
     setScanning(false);
     setShowScannerDiv(false);
+    setShowConfirmation(false);
+    setCustomerData(null);
+  };
+
+  const handleConfirmationSuccess = () => {
+    // Reset the scanner after successful confirmation
+    resetScanner();
   };
 
   useEffect(() => {
@@ -243,6 +285,14 @@ export const QRScanner = () => {
       <div className="text-center text-sm text-gray-500">
         <p>Point your camera at a customer's QR code to add loyalty points</p>
       </div>
+
+      {/* Confirmation Dialog */}
+      <QRConfirmationDialog
+        isOpen={showConfirmation}
+        onClose={() => setShowConfirmation(false)}
+        customerData={customerData}
+        onConfirm={handleConfirmationSuccess}
+      />
     </div>
   );
 };
