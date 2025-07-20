@@ -218,7 +218,7 @@ export const QRScanner = () => {
               <div
                 id="qr-scanner"
                 ref={scannerRef}
-                className="w-full h-full rounded-xl bg-neutral-100"
+                className="w-full aspect-[4/3] max-h-[70vh] rounded-xl bg-neutral-100"
               />
               {/* Minimal scan area frame */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
