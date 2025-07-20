@@ -10,88 +10,95 @@ export const QRScanner = () => {
   const scannerRef = useRef<HTMLDivElement>(null);
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
   const [scanning, setScanning] = useState(false);
+  const [showScannerDiv, setShowScannerDiv] = useState(false); // NEW
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const startScanner = async () => {
-    try {
-      setError(null);
+    setError(null);
+    setShowScannerDiv(true); // Show the scanner div first
 
-      // ✅ 1. Check browser support
-      if (
-        typeof window === "undefined" ||
-        !navigator.mediaDevices ||
-        typeof navigator.mediaDevices.getUserMedia !== "function"
-      ) {
-        throw new Error("Camera access not supported on this device/browser.");
-      }
-
-      // ✅ 2. Get list of cameras
-      const cameras = await Html5Qrcode.getCameras();
-      if (!cameras || cameras.length === 0) {
-        throw new Error("No cameras found on this device.");
-      }
-
-      // ✅ 3. Prefer back camera if available
-      const rearCamera = cameras.find((cam) =>
-        cam.label.toLowerCase().includes("back")
-      );
-
-      const selectedCameraId = rearCamera?.id || cameras[0].id;
-
-      if (!scannerRef.current) {
-        throw new Error("Scanner element not found");
-      }
-
-      html5QrCodeRef.current = new Html5Qrcode("qr-scanner");
-
-      const config = {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0,
-        disableFlip: false,
-        supportedScanTypes: [Html5QrcodeSupportedFormats.QR_CODE],
-        experimentalFeatures: {
-          useBarCodeDetectorIfSupported: true,
-        },
-      };
-
-      await html5QrCodeRef.current.start(
-        selectedCameraId, // 🔥 instead of facingMode
-        config,
-        (decodedText) => {
-          handleQRSuccess(decodedText);
-        },
-        (errorMessage) => {
-          if (errorMessage && !errorMessage.includes("No QR code found")) {
-            console.warn("QR scan error:", errorMessage);
-          }
+    // Wait for the div to render
+    setTimeout(async () => {
+      try {
+        // ✅ 1. Check browser support
+        if (
+          typeof window === "undefined" ||
+          !navigator.mediaDevices ||
+          typeof navigator.mediaDevices.getUserMedia !== "function"
+        ) {
+          throw new Error(
+            "Camera access not supported on this device/browser."
+          );
         }
-      );
 
-      setScanning(true);
-    } catch (err: any) {
-      console.error("Scanner initialization error:", err);
+        // ✅ 2. Get list of cameras
+        const cameras = await Html5Qrcode.getCameras();
+        if (!cameras || cameras.length === 0) {
+          throw new Error("No cameras found on this device.");
+        }
 
-      let errorMsg = "Failed to start camera";
-      if (err.name === "NotAllowedError") {
-        errorMsg =
-          "Camera permission denied. Please allow camera access and try again.";
-      } else if (err.name === "NotFoundError") {
-        errorMsg = "No camera found on this device.";
-      } else if (err.name === "NotSupportedError") {
-        errorMsg = "Camera not supported on this device.";
-      } else if (err.message) {
-        errorMsg = err.message;
+        // ✅ 3. Prefer back camera if available
+        const rearCamera = cameras.find((cam) =>
+          cam.label.toLowerCase().includes("back")
+        );
+        const selectedCameraId = rearCamera?.id || cameras[0].id;
+
+        if (!scannerRef.current) {
+          throw new Error("Scanner element not found");
+        }
+
+        html5QrCodeRef.current = new Html5Qrcode("qr-scanner");
+
+        const config = {
+          fps: 10,
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0,
+          disableFlip: false,
+          supportedScanTypes: [Html5QrcodeSupportedFormats.QR_CODE],
+          experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true,
+          },
+        };
+
+        await html5QrCodeRef.current.start(
+          selectedCameraId,
+          config,
+          (decodedText) => {
+            handleQRSuccess(decodedText);
+          },
+          (errorMessage) => {
+            if (errorMessage && !errorMessage.includes("No QR code found")) {
+              console.warn("QR scan error:", errorMessage);
+            }
+          }
+        );
+
+        setScanning(true);
+      } catch (err: any) {
+        console.error("Scanner initialization error:", err);
+
+        let errorMsg = "Failed to start camera";
+        if (err.name === "NotAllowedError") {
+          errorMsg =
+            "Camera permission denied. Please allow camera access and try again.";
+        } else if (err.name === "NotFoundError") {
+          errorMsg = "No camera found on this device.";
+        } else if (err.name === "NotSupportedError") {
+          errorMsg = "Camera not supported on this device.";
+        } else if (err.message) {
+          errorMsg = err.message;
+        }
+
+        setError(errorMsg);
+        toast({
+          title: "Camera Error",
+          description: errorMsg,
+          variant: "destructive",
+        });
+        setShowScannerDiv(false); // Hide scanner div on error
       }
-
-      setError(errorMsg);
-      toast({
-        title: "Camera Error",
-        description: errorMsg,
-        variant: "destructive",
-      });
-    }
+    }, 100); // Wait 100ms for the div to render
   };
 
   const handleQRSuccess = (decodedText: string) => {
@@ -126,9 +133,11 @@ export const QRScanner = () => {
         await html5QrCodeRef.current.clear();
         html5QrCodeRef.current = null;
         setScanning(false);
+        setShowScannerDiv(false); // Hide scanner div
       } catch (err) {
         console.error("Error stopping scanner:", err);
         setScanning(false);
+        setShowScannerDiv(false);
       }
     }
   };
@@ -137,6 +146,7 @@ export const QRScanner = () => {
     setResult(null);
     setError(null);
     setScanning(false);
+    setShowScannerDiv(false);
   };
 
   useEffect(() => {
@@ -177,8 +187,8 @@ export const QRScanner = () => {
 
       {/* Scanner container */}
       <div className="relative">
-        {/* Only render the scanner div when scanning */}
-        {scanning && (
+        {/* Only render the scanner div when showScannerDiv is true */}
+        {showScannerDiv && (
           <div
             id="qr-scanner"
             ref={scannerRef}
@@ -187,7 +197,7 @@ export const QRScanner = () => {
         )}
 
         {/* Show placeholder when not scanning */}
-        {!scanning && !result && (
+        {!showScannerDiv && !result && (
           <div className="w-full h-64 rounded-lg bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
             <div className="text-center text-gray-500">
               <Camera className="w-12 h-12 mx-auto mb-2 opacity-50" />
