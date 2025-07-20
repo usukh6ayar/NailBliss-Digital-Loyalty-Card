@@ -123,7 +123,7 @@ export const QRScanner = () => {
     if (html5QrCodeRef.current && scanning) {
       try {
         await html5QrCodeRef.current.stop();
-        html5QrCodeRef.current.clear();
+        await html5QrCodeRef.current.clear();
         html5QrCodeRef.current = null;
         setScanning(false);
       } catch (err) {
@@ -136,6 +136,7 @@ export const QRScanner = () => {
   const resetScanner = () => {
     setResult(null);
     setError(null);
+    setScanning(false);
   };
 
   useEffect(() => {
@@ -176,13 +177,14 @@ export const QRScanner = () => {
 
       {/* Scanner container */}
       <div className="relative">
-        <div
-          id="qr-scanner"
-          ref={scannerRef}
-          className={`w-full h-64 rounded-lg bg-black ${
-            scanning ? "block" : "hidden"
-          }`}
-        />
+        {/* Only render the scanner div when scanning */}
+        {scanning && (
+          <div
+            id="qr-scanner"
+            ref={scannerRef}
+            className="w-full h-64 rounded-lg bg-black"
+          />
+        )}
 
         {/* Show placeholder when not scanning */}
         {!scanning && !result && (
