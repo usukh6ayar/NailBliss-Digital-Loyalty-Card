@@ -39,10 +39,17 @@ export const QRConfirmationDialog = ({
 
     setIsProcessing(true);
     try {
+      // Get the current user first
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        throw new Error("Authentication required");
+      }
+
       // Call the add_loyalty_point function
       const { error } = await supabase.rpc("add_loyalty_point", {
         p_customer_id: customerData.userId,
-        p_staff_id: (await supabase.auth.getUser()).data.user?.id,
+        p_staff_id: user.id,
       });
 
       if (error) {
